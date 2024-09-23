@@ -1,5 +1,7 @@
 *__pycache__/
 
+*.json
+
 teste.py
 
 scraper.log
