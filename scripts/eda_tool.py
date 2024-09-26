@@ -30,9 +30,9 @@ def make_eda_plots(
                                 sns.boxplot(data=data, x=feature, ax=ax, color=color)
                                 ax.ticklabel_format(style='plain', axis='x')
                         elif kind == 'barplot':
-                                __plot_barplot(data=data, feature=feature, ax=ax)
+                                __plot_barplot(data=data, feature=feature, ax=ax, color=color)
                         else:   
-                                sns.histplot(data=data, x=feature, kde=kde, ax=ax,)
+                                sns.histplot(data=data, x=feature, kde=kde, ax=ax, color=color)
                                 ax.ticklabel_format(style='plain', axis='x')
                                 
                         ax.set_title(feature)  
@@ -52,8 +52,10 @@ def __plot_barplot(data, feature, ax, color=None,
                            .rename(columns={feature: 'count'}).reset_index()
         data_grouped['pctg'] = data_grouped['count'] / data_grouped['count'].sum() * 100
         data_grouped = data_grouped.sort_values(by='pctg', ascending=True)
-
-        ax.barh(bar_orientation=data_grouped[feature], width=data_grouped['pctg'])
+        if bar_orientation == 'y':
+                ax.barh(y=data_grouped[feature], width=data_grouped['pctg'], color=color)
+        else:
+                ax.barh(x=data_grouped[feature], width=data_grouped['pctg'], color=color)
 
         if pd.api.types.is_numeric_dtype(data_grouped[feature]):
                 ax.invert_yaxis()
