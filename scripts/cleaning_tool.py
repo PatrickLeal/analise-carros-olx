@@ -16,7 +16,7 @@ def limpar_dados_silver(data: DataFrame) -> DataFrame:
     df['qtd_opcionais'] = [len(opc.split(',')) for opc in df.OPCIONAIS]
 
     df = df.dropna().reset_index(drop=True)
-    df.ANO = df.ANO.str.replace('ou anterior', '').str.strip().astype(int)
+    df.ANO = df.ANO.replace({'1950 ou anterior': 1950}).astype(int)
     df.PORTAS = df.PORTAS.str.replace('portas', '').str.strip().astype(int)
     df.POTENCIA_DO_MOTOR = df.POTENCIA_DO_MOTOR.astype('category')
     df.CEP = df.CEP.astype('category')
