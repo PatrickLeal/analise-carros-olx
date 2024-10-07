@@ -10,7 +10,8 @@ type ColumnsList = List[ColumnName]
 def make_eda_plots(
         data:DataFrame, features:List[ColumnName] | ColumnsList, kde:bool=False,
         kind:Literal['histplot', 'boxplot', 'barplot']='histplot',
-        hue:ColumnName|None= None, color:str=None,
+        bar_metric:Literal['pctg', 'mean']='pctg',
+        hue:ColumnName|None= None, color:str=None, feature_target:ColumnName=None,
         figsize=(24, 12)) -> None:
 
         try:
@@ -30,7 +31,8 @@ def make_eda_plots(
                                 sns.boxplot(data=data, x=feature, ax=ax, color=color)
                                 ax.ticklabel_format(style='plain', axis='x')
                         elif kind == 'barplot':
-                                __plot_barplot(data=data, feature=feature, ax=ax, color=color)
+                                __plot_barplot(data=data, feature=feature, ax=ax, color=color,
+                                               bar_metric=bar_metric, feature_target=feature_target)
                         else:   
                                 sns.histplot(data=data, x=feature, kde=kde, ax=ax, color=color)
                                 ax.ticklabel_format(style='plain', axis='x')
@@ -38,30 +40,47 @@ def make_eda_plots(
                         ax.set_title(feature)  
                         ax.set_xlabel('')
 
+                # removendo axes não usados
                 if qtd_features < len(axes.flat):
                         for j in range(qtd_features, len(axes.flat)):
                                 fig.delaxes(axes.flat[j])
+
                 plt.tight_layout()
 
         except Exception as e:
                 raise(e)
 
-def __plot_barplot(data, feature, ax, color=None,
-                   bar_label_dist:float=.5, bar_orientation:Literal['y', 'x']='y') -> None:
-        data_grouped = data.groupby([feature])[[feature]].count()\
-                           .rename(columns={feature: 'count'}).reset_index()
-        data_grouped['pctg'] = data_grouped['count'] / data_grouped['count'].sum() * 100
-        data_grouped = data_grouped.sort_values(by='pctg', ascending=True)
-        if bar_orientation == 'y':
-                ax.barh(y=data_grouped[feature], width=data_grouped['pctg'], color=color)
-        else:
-                ax.barh(x=data_grouped[feature], width=data_grouped['pctg'], color=color)
+def __plot_barplot(data, feature, ax, bar_metric, feature_target=None, color=None,
+                   bar_label_dist:float=.5, bar_orientation:Literal['y', 'x']='y',
+                   ) -> None:
+        
+        if bar_metric == 'mean':
+              if feature_target == None:
+                      msg = "É necessário preencher a variável que será usada para medir a média."
+                      raise Exception(msg)
+              data_grouped = data.groupby([feature])[[feature_target]].mean().reset_index()
+              data_grouped[feature_target] = round(data_grouped[feature_target], 2)
+              data_grouped = data_grouped.sort_values(by=feature_target, ascending=True)
+              ax.barh(y=data_grouped[feature], width=data_grouped[feature_target]) 
 
-        if pd.api.types.is_numeric_dtype(data_grouped[feature]):
-                ax.invert_yaxis()
-                                
-        for index, value in enumerate(data_grouped['pctg']): # rotulando as barras
-                ax.text(value + bar_label_dist, index, f'{value:.1f}%', va='center', fontsize=15)
+              for index, value in enumerate(data_grouped[feature_target]):
+                # Ajustando a posição do texto
+                ax.text(value + value * .05, index, f'{value:_.0f} $', va='center', fontsize=15) 
+        else:
+                data_grouped = data.groupby([feature])[[feature]].count()\
+                                .rename(columns={feature: 'count'}).reset_index()
+                data_grouped['pctg'] = data_grouped['count'] / data_grouped['count'].sum() * 100
+                data_grouped = data_grouped.sort_values(by='pctg', ascending=True)
+                if bar_orientation == 'y':
+                        ax.barh(y=data_grouped[feature], width=data_grouped['pctg'], color=color)
+                else:
+                        ax.barh(x=data_grouped[feature], width=data_grouped['pctg'], color=color)
+
+                if pd.api.types.is_numeric_dtype(data_grouped[feature]):
+                        ax.invert_yaxis()
+                                        
+                for index, value in enumerate(data_grouped['pctg']): # rotulando as barras
+                        ax.text(value + bar_label_dist, index, f'{value:.1f}%', va='center', fontsize=15)
 
         ax.ticklabel_format(style='plain', axis='x')
         ax.set_yticks(ticks=range(data_grouped[feature].nunique()),
