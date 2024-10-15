@@ -65,7 +65,7 @@ def __plot_barplot(data, feature, ax, bar_metric, feature_target=None, color=Non
 
               for index, value in enumerate(data_grouped[feature_target]):
                 # Ajustando a posição do texto
-                ax.text(value + value * .05, index, f'{value:_.0f} $', va='center', fontsize=15) 
+                ax.text(value + value * .05, index, f'{value:_.0f} R$', va='center', fontsize=15) 
         else:
                 data_grouped = data.groupby([feature])[[feature]].count()\
                                 .rename(columns={feature: 'count'}).reset_index()
