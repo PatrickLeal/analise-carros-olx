@@ -28,13 +28,14 @@ def make_eda_plots(
 
                         if kind == 'boxplot':
                                 # PLOT BOXPLOT
-                                sns.boxplot(data=data, x=feature, ax=ax, color=color)
+                                sns.boxplot(data=data, x=feature, ax=ax, color=color, hue=hue)
                                 ax.ticklabel_format(style='plain', axis='x')
                         elif kind == 'barplot':
                                 __plot_barplot(data=data, feature=feature, ax=ax, color=color,
                                                bar_metric=bar_metric, feature_target=feature_target)
                         else:   
-                                sns.histplot(data=data, x=feature, kde=kde, ax=ax, color=color)
+                                sns.histplot(data=data, x=feature, kde=kde, ax=ax,
+                                             color=color, hue=hue)
                                 ax.ticklabel_format(style='plain', axis='x')
                                 
                         ax.set_title(feature)  
