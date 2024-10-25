@@ -1,0 +1,9 @@
+axes.facecolor : 'white'
+axes.linewidth : 1
+xtick.color    : 'black'
+ytick.color    : 'black'
+grid.color     : 'lightgray'
+figure.dpi     : 150
+figure.figsize : 14, 6
+axes.grid      : True
+font.size      : 12
