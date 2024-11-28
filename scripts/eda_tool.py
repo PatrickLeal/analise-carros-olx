@@ -13,7 +13,19 @@ def make_eda_plots(
         bar_metric:Literal['pctg', 'mean']='pctg',
         hue:ColumnName|None= None, color:str=None, feature_target:ColumnName=None,
         figsize=(24, 12)) -> None:
+        """Função para facilitar na exibição de gráficos.
 
+        Args:
+            data (DataFrame): dataset usado
+            features (List[ColumnName] | ColumnsList): coluna ou lista com colunas a serem exibidas
+            kde (bool, optional): _description_. Defaults to False.
+            kind (Literal[&#39;histplot&#39;, &#39;boxplot&#39;, &#39;barplot&#39;], optional): Qual tipo de gráfico será exibido. Defaults to 'histplot'.
+            bar_metric (Literal[&#39;pctg&#39;, &#39;mean&#39;], optional): _description_. Defaults to 'pctg'.
+            hue (ColumnName | None, optional): _description_. Defaults to None.
+            color (str, optional): _description_. Defaults to None.
+            feature_target (ColumnName, optional): _description_. Defaults to None.
+            figsize (tuple, optional): _description_. Defaults to (24, 12).
+        """
         try:
                 qtd_features = len(features)
                 qtd_rows = qtd_features // 3 + (qtd_features % 3 > 0)
@@ -95,6 +107,13 @@ def __plot_barplot(data, feature, ax, bar_metric, feature_target=None, color=Non
         ax.set_title(feature)
         
 def check_outliers(data: DataFrame, features: ColumnName|ColumnsList) -> None:
+        """Função para auxiliar na compreensão dos Outiliers das variáveis
+
+        Args:
+            data (DataFrame): dados a serem usados
+            features (ColumnName | ColumnsList): colunas que devem ser verificadas.
+        """
+
         outlier_counts = {}
         outlier_indexes = {}
         total_outliers = 0
